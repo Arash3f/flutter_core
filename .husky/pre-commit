@@ -1,0 +1,18 @@
+#!/bin/sh
+# Formatting and static analysis before the commit is created.
+# Skipped with a warning when Flutter is not on PATH, so the hook never blocks
+# a machine that only edits docs.
+
+if ! command -v flutter >/dev/null 2>&1; then
+  echo "pre-commit: flutter not found on PATH, skipping format + analyze"
+  exit 0
+fi
+
+echo "pre-commit: dart format"
+dart format --set-exit-if-changed lib || {
+  echo "pre-commit: files were reformatted. Stage them and commit again."
+  exit 1
+}
+
+echo "pre-commit: flutter analyze"
+flutter analyze

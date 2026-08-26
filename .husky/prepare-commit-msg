@@ -1,0 +1,5 @@
+#!/bin/sh
+# Opens the commitizen prompt so every message follows .cz-config.js.
+# `|| true` keeps non-interactive commits (merge, rebase, IDE, CI) working.
+
+exec < /dev/tty && npx --no-install cz --hook || true

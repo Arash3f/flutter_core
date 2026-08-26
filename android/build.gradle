@@ -1,0 +1,44 @@
+allprojects {
+    repositories {
+        // storage.googleapis.com/download.flutter.io answers 403 from here, so the
+        // engine artifacts come from a mirror instead.
+        maven { url "https://mirrors.cloud.tencent.com/flutter/download.flutter.io" }
+        maven { url "https://mirrors.cloud.tencent.com/nexus/repository/maven-public/" }
+        google()
+        mavenCentral()
+    }
+}
+
+// `rootProject.buildDir` is deprecated in Gradle 8 and removed in 9.
+rootProject.layout.buildDirectory.value(rootProject.layout.buildDirectory.dir("../../build").get())
+
+subprojects {
+    project.layout.buildDirectory.value(
+        rootProject.layout.buildDirectory.dir(project.name).get()
+    )
+}
+
+// Only SDK platform 36 and build-tools 36.0.0 are installed on this machine, and
+// the Google SDK repository is unreachable from here, so every plugin is aligned
+// onto them instead of the version it happens to ask for (jni wants 35,
+// flutter_secure_storage wants 37).
+// Registered before `evaluationDependsOn` below, which would otherwise evaluate
+// `:app` first and make `afterEvaluate` illegal for it.
+subprojects {
+    afterEvaluate { sub ->
+        def androidExt = sub.extensions.findByName("android")
+        if (androidExt == null) {
+            return
+        }
+        androidExt.compileSdk = 36
+        androidExt.buildToolsVersion = "36.0.0"
+    }
+}
+
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.layout.buildDirectory
+}
