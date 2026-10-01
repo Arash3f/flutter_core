@@ -1,83 +1,65 @@
-// Generates the placeholder launcher icon from code, so a new project has a
-// valid icon without a designer and without binary files of unknown origin.
-//
-// Run from the project root:
-//
-//   dart run tool/gen_icon.dart
-//   dart run flutter_launcher_icons
-//
-// Replace the two PNGs with real artwork whenever it exists; nothing else
-// depends on this script.
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:image/image.dart';
 
-const int _size = 1024;
-
-/// `CustomColors.primary` (#2563EB). Keep in sync with
-/// `flutter_launcher_icons.adaptive_icon_background` in `pubspec.yaml`.
-final ColorRgba8 _brand = ColorRgba8(0x25, 0x63, 0xEB, 255);
-
+/// Builds launcher icons from the Arash Alfooneh brand mark in `assets/brand/`.
+///
+/// Brand primary form: Signal Blue ribbon on Ink. Using a blue mark on a blue
+/// adaptive background makes the logo invisible on Android — do not do that.
+///
+/// ```shell
+/// dart run tool/gen_icon.dart
+/// dart run flutter_launcher_icons
+/// ```
 void main() {
-  final icon = Image(width: _size, height: _size, numChannels: 4);
-  fill(icon, color: _brand);
-  _drawMark(icon, scale: 1);
+  final markBlue = _read('assets/brand/mark-blue.png');
+  final markWhite = _read('assets/brand/mark-white.png');
+
+  const size = 1024;
+  final ink = ColorRgba8(0x08, 0x09, 0x0D, 255);
+  final signalBlue = ColorRgba8(0x01, 0x6D, 0xF1, 255);
+
+  // Store / iOS / legacy: Ink tile + blue ribbon (primary brand form).
+  final icon = Image(width: size, height: size, numChannels: 4);
+  fill(icon, color: ink);
+  _pasteCentered(icon, markBlue, scale: 0.7);
   _write('assets/icons/app_icon.png', icon);
 
-  // Android adaptive icons crop to the inner ~66%, so the foreground mark is
-  // drawn smaller on a transparent canvas.
-  final foreground = Image(width: _size, height: _size, numChannels: 4);
-  _drawMark(foreground, scale: 0.66);
+  // Android adaptive foreground must contrast with [adaptive_icon_background].
+  // Background is Ink → blue mark. (A blue mark on Signal Blue is invisible.)
+  final foreground = Image(width: size, height: size, numChannels: 4);
+  _pasteCentered(foreground, markBlue, scale: 0.62);
   _write('assets/icons/app_icon_foreground.png', foreground);
 
-  stdout.writeln('icons written to assets/icons/');
+  // Optional blue-tile variant kept for places that want Signal Blue chrome.
+  final blueTile = Image(width: size, height: size, numChannels: 4);
+  fill(blueTile, color: signalBlue);
+  _pasteCentered(blueTile, markWhite, scale: 0.7);
+  _write('assets/icons/app_icon_blue.png', blueTile);
+
+  stdout.writeln('icons written to assets/icons/ (Ink + blue mark)');
 }
 
-/// Three stacked rhombi, the same idea as `AppMark` (`Icons.layers_rounded`).
-void _drawMark(Image image, {required double scale}) {
-  const center = _size / 2;
-  final halfWidth = 300 * scale;
-  final halfHeight = 150 * scale;
-  final step = 110 * scale;
-
-  final outline = math.max(1, (16 * scale).round());
-
-  // Back to front; tints are opaque so the layers occlude each other.
-  for (final (offset, tint) in [(step, 0.55), (0.0, 0.78), (-step, 1.0)]) {
-    final cy = center + offset;
-    final corners = [
-      (x: center, y: cy - halfHeight),
-      (x: center + halfWidth, y: cy),
-      (x: center, y: cy + halfHeight),
-      (x: center - halfWidth, y: cy),
-    ];
-    fillPolygon(
-      image,
-      vertices: [for (final c in corners) Point(c.x, c.y)],
-      color: _whiteOverBrand(tint),
-    );
-    // A brand-colored edge separates a layer from the one below it.
-    for (var i = 0; i < corners.length; i++) {
-      final a = corners[i];
-      final b = corners[(i + 1) % corners.length];
-      drawLine(
-        image,
-        x1: a.x.round(),
-        y1: a.y.round(),
-        x2: b.x.round(),
-        y2: b.y.round(),
-        color: _brand,
-        thickness: outline,
-        antialias: true,
-      );
-    }
+Image _read(String path) {
+  final bytes = File(path).readAsBytesSync();
+  final image = decodePng(bytes);
+  if (image == null) {
+    throw StateError('Could not decode $path');
   }
+  return image;
 }
 
-ColorRgba8 _whiteOverBrand(double amount) {
-  int mix(num channel) => (channel + (255 - channel) * amount).round();
-  return ColorRgba8(mix(_brand.r), mix(_brand.g), mix(_brand.b), 255);
+void _pasteCentered(Image canvas, Image source, {required double scale}) {
+  final target = (canvas.width * scale).round();
+  final resized = copyResize(
+    source,
+    width: target,
+    height: target,
+    interpolation: Interpolation.cubic,
+  );
+  final ox = ((canvas.width - resized.width) / 2).round();
+  final oy = ((canvas.height - resized.height) / 2).round();
+  compositeImage(canvas, resized, dstX: ox, dstY: oy);
 }
 
 void _write(String path, Image image) {
