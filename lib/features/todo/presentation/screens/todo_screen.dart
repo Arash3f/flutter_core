@@ -27,34 +27,28 @@ class TodoScreen extends ConsumerWidget {
       }
     });
 
-    // No AppBar: the screen lives inside AdaptiveShell, which owns it.
-    return Scaffold(
-      body: Column(
-        children: [
-          AppPageHeader(title: LocaleKeys.todoTitle.tr()),
-          SizedBox(
-            height: 2,
-            child: todosAsync.isLoading && todosAsync.hasValue
-                ? const LinearProgressIndicator(minHeight: 2)
-                : null,
-          ),
-          const AddTodoField(),
-          if (todosAsync.hasValue)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: TSizes.md),
-              child: Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: Text(
-                  LocaleKeys.todoRemaining.tr(
-                    namedArgs: {'count': remaining.toString()},
-                  ),
-                  style: Theme.of(context).textTheme.bodySmall,
+    // No AppBar / Scaffold: the screen lives inside AdaptiveShell, which owns
+    // both. A nested Scaffold would briefly paint ColorScheme.surface before
+    // the outer scaffold color, flashing white on every tab change.
+    return Column(
+      children: [
+        AppPageHeader(title: LocaleKeys.todoTitle.tr()),
+        const AddTodoField(),
+        if (todosAsync.hasValue)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: TSizes.md),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                LocaleKeys.todoRemaining.tr(
+                  namedArgs: {'count': remaining.toString()},
                 ),
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
-          Expanded(child: _Body(todosAsync: todosAsync)),
-        ],
-      ),
+          ),
+        Expanded(child: _Body(todosAsync: todosAsync)),
+      ],
     );
   }
 

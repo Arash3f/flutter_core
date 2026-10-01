@@ -66,14 +66,10 @@ class TodoListNotifier extends AsyncNotifier<List<Todo>> {
   Future<List<Todo>> _load() =>
       ref.read(getTodosProvider).call(const NoParams());
 
-  /// Keeps the previous list on screen while the write is in flight, then
-  /// reloads.
-  ///
-  /// Riverpod 3 carries the last value over when an `AsyncNotifier` is set to
-  /// `AsyncLoading` or `AsyncError`, so a failed write leaves the list
-  /// visible (`hasValue && hasError`) instead of blanking it.
+  /// Reloads after a write. Skips `AsyncLoading` when a list is already on
+  /// screen so toggles do not flash a progress bar or blank the body.
   Future<void> _mutate(Future<void> Function() operation) async {
-    state = const AsyncLoading();
+    if (!state.hasValue) state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await operation();
       return _load();
