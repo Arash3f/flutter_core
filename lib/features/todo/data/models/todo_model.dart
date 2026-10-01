@@ -14,23 +14,23 @@ class TodoModel extends Todo {
   });
 
   factory TodoModel.fromEntity(Todo todo) => TodoModel(
-        id: todo.id,
-        title: todo.title,
-        createdAt: todo.createdAt,
-        isCompleted: todo.isCompleted,
-      );
+    id: todo.id,
+    title: todo.title,
+    createdAt: todo.createdAt,
+    isCompleted: todo.isCompleted,
+  );
 
   factory TodoModel.fromJson(Map<String, dynamic> json) => TodoModel(
-        id: json['id'] as String,
-        title: json['title'] as String,
-        createdAt: DateTime.parse(json['createdAt'] as String),
-        isCompleted: json['isCompleted'] as bool? ?? false,
-      );
+    id: json['id'] as String,
+    title: json['title'] as String,
+    createdAt: DateTime.parse(json['createdAt'] as String),
+    isCompleted: json['isCompleted'] as bool? ?? false,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'createdAt': createdAt.toIso8601String(),
-        'isCompleted': isCompleted,
-      };
+    'id': id,
+    'title': title,
+    'createdAt': createdAt.toIso8601String(),
+    'isCompleted': isCompleted,
+  };
 }

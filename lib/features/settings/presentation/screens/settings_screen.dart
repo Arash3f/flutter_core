@@ -4,6 +4,8 @@ import 'package:flutter_core/core/providers/app_settings_provider.dart';
 import 'package:flutter_core/core/utils/constants/enum.dart';
 import 'package:flutter_core/core/utils/constants/sizes.dart';
 import 'package:flutter_core/core/utils/l10n/locale_keys.g.dart';
+import 'package:flutter_core/core/widgets/app_ui.dart';
+import 'package:flutter_core/core/widgets/appearance_controls.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Demonstrates a feature that only has a presentation layer: there is no
@@ -16,51 +18,42 @@ class SettingsScreen extends ConsumerWidget {
     final settings = ref.watch(appSettingsProvider);
     final notifier = ref.read(appSettingsProvider.notifier);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(LocaleKeys.settingsTitle.tr())),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: TSizes.sm),
-        children: [
-          _SectionTitle(LocaleKeys.settingsTheme.tr()),
-          for (final mode in ThemeMode.values)
-            _ChoiceTile(
-              label: _themeLabel(mode),
-              isSelected: settings.themeMode == mode,
-              onTap: () => notifier.setThemeMode(mode),
-            ),
-          const Divider(height: TSizes.lg),
-          _SectionTitle(LocaleKeys.settingsLanguage.tr()),
-          for (final language in LanguageList.values)
-            _ChoiceTile(
-              label: language.label,
-              isSelected: settings.language == language,
-              onTap: () async {
-                await notifier.setLanguage(language);
-                // easy_localization keeps its own locale, so it has to be told
-                // about the change as well.
-                if (context.mounted) await context.setLocale(language.locale);
-              },
-            ),
-        ],
-      ),
+    // No AppBar: the screen lives inside AdaptiveShell, which owns it.
+    return ListView(
+      padding: const EdgeInsets.only(bottom: TSizes.lg),
+      children: [
+        AppPageHeader(title: LocaleKeys.settingsTitle.tr()),
+        _SectionTitle(LocaleKeys.settingsTheme.tr()),
+        for (final mode in ThemeMode.values)
+          _ChoiceTile(
+            icon: themeModeIcon(mode),
+            label: themeModeLabel(mode),
+            isSelected: settings.themeMode == mode,
+            onTap: () => notifier.setThemeMode(mode),
+          ),
+        const Divider(height: TSizes.lg),
+        _SectionTitle(LocaleKeys.settingsLanguage.tr()),
+        for (final language in LanguageList.values)
+          _ChoiceTile(
+            icon: Icons.translate_rounded,
+            label: language.label,
+            isSelected: settings.language == language,
+            onTap: () => setAppLanguage(context, ref, language),
+          ),
+      ],
     );
   }
-
-  static String _themeLabel(ThemeMode mode) => switch (mode) {
-        ThemeMode.system => LocaleKeys.settingsThemeSystem.tr(),
-        ThemeMode.light => LocaleKeys.settingsThemeLight.tr(),
-        ThemeMode.dark => LocaleKeys.settingsThemeDark.tr(),
-      };
 }
 
 class _ChoiceTile extends StatelessWidget {
   const _ChoiceTile({
+    required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
-    super.key,
   });
 
+  final IconData icon;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
@@ -68,6 +61,7 @@ class _ChoiceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      leading: Icon(icon),
       title: Text(label),
       selected: isSelected,
       onTap: onTap,
@@ -79,7 +73,7 @@ class _ChoiceTile extends StatelessWidget {
 }
 
 class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.title, {super.key});
+  const _SectionTitle(this.title);
 
   final String title;
 

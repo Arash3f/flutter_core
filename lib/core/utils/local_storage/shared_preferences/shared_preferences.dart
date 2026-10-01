@@ -43,10 +43,10 @@ class SharedPrefs {
       final double v => _storage.setDouble(key, v),
       final List<String> v => _storage.setStringList(key, v),
       _ => throw ArgumentError.value(
-          value,
-          'value',
-          'SharedPreferences cannot store ${value.runtimeType}',
-        ),
+        value,
+        'value',
+        'SharedPreferences cannot store ${value.runtimeType}',
+      ),
     };
   }
 

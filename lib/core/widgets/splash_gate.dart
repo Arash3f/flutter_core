@@ -1,64 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_core/core/utils/colors/custom_colors.dart';
-import 'package:flutter_core/core/utils/constants/sizes.dart';
+import 'package:flutter_core/core/utils/constants/feature_flags.dart';
+import 'package:flutter_core/core/widgets/splash_screen.dart';
+import 'package:flutter_core/features/auth/presentation/providers/auth_providers.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Brands the first Flutter frames after the native splash is removed.
+/// Shows [SplashScreen] until bootstrap finishes, then reveals [child].
 ///
-/// Does not own navigation — [SplashGate] swaps this out when bootstrap
-/// finishes.
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: CustomColors.primary,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: TSizes.md,
-          children: [
-            Icon(
-              Icons.layers_rounded,
-              size: TSizes.iconLg * 2,
-              color: CustomColors.white,
-            ),
-            Text(
-              'Flutter Core',
-              style: TextStyle(
-                color: CustomColors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.4,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Shows [SplashScreen] until the app is ready, then reveals [child].
+/// SharedPreferences and localization are initialized in `main` before the
+/// first frame. This gate covers the async work that needs providers - today
+/// restoring the auth session, so the router's first redirect already knows
+/// whether the user is signed in and never flashes the login page.
 ///
-/// SharedPreferences and localization are already initialized in `main`
-/// before the first frame; this gate covers a short branding window and any
-/// future async warm-ups without a router.
-class SplashGate extends StatefulWidget {
+/// Add further warm-ups (remote config, feature flags, ...) to [_bootstrap].
+class SplashGate extends ConsumerStatefulWidget {
   const SplashGate({required this.child, super.key});
 
   final Widget child;
 
-  /// Minimum time the Flutter splash stays visible after native splash.
-  static const Duration minDisplay = Duration(milliseconds: 900);
+  /// Lower bound so the splash animation does not flash by on fast devices.
+  static const Duration minDisplay = Duration(milliseconds: 1200);
 
   @override
-  State<SplashGate> createState() => _SplashGateState();
+  ConsumerState<SplashGate> createState() => _SplashGateState();
 }
 
-class _SplashGateState extends State<SplashGate> {
+class _SplashGateState extends ConsumerState<SplashGate> {
   bool _ready = false;
 
   @override
@@ -72,7 +40,14 @@ class _SplashGateState extends State<SplashGate> {
     // Native splash can go away as soon as Flutter paints this screen.
     FlutterNativeSplash.remove();
 
-    await Future<void>.delayed(SplashGate.minDisplay);
+    await Future.wait<void>([
+      Future<void>.delayed(SplashGate.minDisplay),
+      if (FeatureFlags.authEnabled)
+        // Never rejects: the session resolves to anonymous on any error.
+        ref
+            .read(authSessionProvider.future)
+            .then<void>((_) {}, onError: (Object _) {}),
+    ]);
 
     if (!mounted) return;
 

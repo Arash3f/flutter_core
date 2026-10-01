@@ -25,9 +25,9 @@ class AppSettings extends Equatable {
 class AppSettingsNotifier extends Notifier<AppSettings> {
   @override
   AppSettings build() => AppSettings(
-        themeMode: AppStorageHelper.getActiveTheme(),
-        language: AppStorageHelper.getActiveLanguage(),
-      );
+    themeMode: AppStorageHelper.getActiveTheme(),
+    language: AppStorageHelper.getActiveLanguage(),
+  );
 
   Future<void> setThemeMode(ThemeMode themeMode) async {
     if (themeMode == state.themeMode) return;
@@ -46,5 +46,6 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
   }
 }
 
-final appSettingsProvider =
-    NotifierProvider<AppSettingsNotifier, AppSettings>(AppSettingsNotifier.new);
+final appSettingsProvider = NotifierProvider<AppSettingsNotifier, AppSettings>(
+  AppSettingsNotifier.new,
+);

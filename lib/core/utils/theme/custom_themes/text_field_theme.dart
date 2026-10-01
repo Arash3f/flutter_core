@@ -7,16 +7,16 @@ class TTextFormFieldTheme {
   const TTextFormFieldTheme._();
 
   static InputDecorationTheme lightInputDecorationTheme() => _build(
-        fillColor: const Color(0xFFF3F4F6),
-        labelColor: CustomColors.greyDark,
-        borderColor: CustomColors.greyLight,
-      );
+    fillColor: const Color(0xFFF3F4F6),
+    labelColor: CustomColors.greyDark,
+    borderColor: CustomColors.greyLight,
+  );
 
   static InputDecorationTheme darkInputDecorationTheme() => _build(
-        fillColor: const Color(0xFF1E293B),
-        labelColor: CustomColors.greyLight,
-        borderColor: CustomColors.greyDark,
-      );
+    fillColor: const Color(0xFF1E293B),
+    labelColor: CustomColors.greyLight,
+    borderColor: CustomColors.greyDark,
+  );
 
   static InputDecorationTheme _build({
     required Color fillColor,

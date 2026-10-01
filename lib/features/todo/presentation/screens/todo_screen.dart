@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_core/core/error/error_message.dart';
 import 'package:flutter_core/core/utils/constants/sizes.dart';
 import 'package:flutter_core/core/utils/l10n/locale_keys.g.dart';
+import 'package:flutter_core/core/widgets/app_ui.dart';
+import 'package:flutter_core/core/widgets/feedback.dart';
 import 'package:flutter_core/features/todo/domain/entities/todo.dart';
 import 'package:flutter_core/features/todo/presentation/providers/todo_providers.dart';
 import 'package:flutter_core/features/todo/presentation/widgets/add_todo_field.dart';
@@ -25,18 +27,17 @@ class TodoScreen extends ConsumerWidget {
       }
     });
 
+    // No AppBar: the screen lives inside AdaptiveShell, which owns it.
     return Scaffold(
-      appBar: AppBar(
-        title: Text(LocaleKeys.todoTitle.tr()),
-        bottom: todosAsync.isLoading && todosAsync.hasValue
-            ? const PreferredSize(
-                preferredSize: Size.fromHeight(2),
-                child: LinearProgressIndicator(minHeight: 2),
-              )
-            : null,
-      ),
       body: Column(
         children: [
+          AppPageHeader(title: LocaleKeys.todoTitle.tr()),
+          SizedBox(
+            height: 2,
+            child: todosAsync.isLoading && todosAsync.hasValue
+                ? const LinearProgressIndicator(minHeight: 2)
+                : null,
+          ),
           const AddTodoField(),
           if (todosAsync.hasValue)
             Padding(
@@ -44,9 +45,9 @@ class TodoScreen extends ConsumerWidget {
               child: Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: Text(
-                  LocaleKeys.todoRemaining.tr(namedArgs: {
-                    'count': remaining.toString(),
-                  }),
+                  LocaleKeys.todoRemaining.tr(
+                    namedArgs: {'count': remaining.toString()},
+                  ),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
@@ -57,15 +58,12 @@ class TodoScreen extends ConsumerWidget {
     );
   }
 
-  static void _showError(BuildContext context, Object error) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(describeError(error))));
-  }
+  static void _showError(BuildContext context, Object error) =>
+      showErrorToast(context, error);
 }
 
 class _Body extends ConsumerWidget {
-  const _Body({required this.todosAsync, super.key});
+  const _Body({required this.todosAsync});
 
   final AsyncValue<List<Todo>> todosAsync;
 
@@ -108,7 +106,7 @@ class _Body extends ConsumerWidget {
 }
 
 class _ErrorView extends ConsumerWidget {
-  const _ErrorView({required this.error, super.key});
+  const _ErrorView({required this.error});
 
   final Object error;
 
@@ -141,4 +139,3 @@ class _ErrorView extends ConsumerWidget {
     );
   }
 }
-

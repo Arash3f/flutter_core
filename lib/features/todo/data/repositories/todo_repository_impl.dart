@@ -19,41 +19,41 @@ class TodoRepositoryImpl implements TodoRepository {
 
   @override
   Future<Todo> addTodo(String title) => _guard(() async {
-        final todos = await _localDataSource.readAll();
+    final todos = await _localDataSource.readAll();
 
-        final todo = TodoModel(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
-          title: title,
-          createdAt: DateTime.now(),
-        );
+    final todo = TodoModel(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      title: title,
+      createdAt: DateTime.now(),
+    );
 
-        await _localDataSource.writeAll([...todos, todo]);
-        return todo;
-      });
+    await _localDataSource.writeAll([...todos, todo]);
+    return todo;
+  });
 
   @override
   Future<Todo> toggleTodo(String id) => _guard(() async {
-        final todos = await _localDataSource.readAll();
-        final index = todos.indexWhere((todo) => todo.id == id);
+    final todos = await _localDataSource.readAll();
+    final index = todos.indexWhere((todo) => todo.id == id);
 
-        if (index == -1) {
-          throw const ValidationFailure(LocaleKeys.errorTodoNotFound);
-        }
+    if (index == -1) {
+      throw const ValidationFailure(LocaleKeys.errorTodoNotFound);
+    }
 
-        final toggled = TodoModel.fromEntity(todos[index].toggled());
-        final updated = [...todos]..[index] = toggled;
+    final toggled = TodoModel.fromEntity(todos[index].toggled());
+    final updated = [...todos]..[index] = toggled;
 
-        await _localDataSource.writeAll(updated);
-        return toggled;
-      });
+    await _localDataSource.writeAll(updated);
+    return toggled;
+  });
 
   @override
   Future<void> deleteTodo(String id) => _guard(() async {
-        final todos = await _localDataSource.readAll();
-        await _localDataSource.writeAll(
-          todos.where((todo) => todo.id != id).toList(),
-        );
-      });
+    final todos = await _localDataSource.readAll();
+    await _localDataSource.writeAll(
+      todos.where((todo) => todo.id != id).toList(),
+    );
+  });
 
   Future<T> _guard<T>(Future<T> Function() operation) async {
     try {
@@ -64,7 +64,11 @@ class TodoRepositoryImpl implements TodoRepository {
       LoggerService.error('TodoRepository failure', error, stackTrace);
       FailureMapper.mapAndThrow(error);
     } on Object catch (error, stackTrace) {
-      LoggerService.error('TodoRepository unexpected failure', error, stackTrace);
+      LoggerService.error(
+        'TodoRepository unexpected failure',
+        error,
+        stackTrace,
+      );
       throw const UnexpectedFailure();
     }
   }

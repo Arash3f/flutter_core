@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// `SharedPrefs`.
 class SecureStorage {
   const SecureStorage([FlutterSecureStorage? secureStorage])
-      : _secureStorage = secureStorage ?? const FlutterSecureStorage();
+    : _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   final FlutterSecureStorage _secureStorage;
 
@@ -22,7 +22,7 @@ class SecureStorage {
   Future<void> clear() => _secureStorage.deleteAll();
 
   /// ! My Keys
-  static const String email = 'email';
-  static const String password = 'password';
-  static const String token = 'token';
+  static const String accessToken = 'access_token';
+  static const String refreshToken = 'refresh_token';
+  static const String tokenType = 'token_type';
 }

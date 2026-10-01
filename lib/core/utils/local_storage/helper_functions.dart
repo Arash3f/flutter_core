@@ -36,12 +36,34 @@ class AppStorageHelper {
   /// `BuildContext` instead of this helper.
   static bool isThemeDark() => getActiveTheme() == ThemeMode.dark;
 
-  static Future<String?> getUserToken() =>
-      _secureStorage.read(key: SecureStorage.token);
+  static Future<String?> getAccessToken() =>
+      _secureStorage.read(key: SecureStorage.accessToken);
 
-  static Future<void> setUserToken(String token) =>
-      _secureStorage.write(key: SecureStorage.token, value: token);
+  static Future<String?> getRefreshToken() =>
+      _secureStorage.read(key: SecureStorage.refreshToken);
 
-  static Future<void> clearUserToken() =>
-      _secureStorage.delete(key: SecureStorage.token);
+  /// Writes the pair together so a crash between the two writes cannot leave
+  /// a new access token next to a stale refresh token for long: the next
+  /// refresh simply fails and the user logs in again.
+  static Future<void> setTokens({
+    required String accessToken,
+    required String refreshToken,
+    String tokenType = 'bearer',
+  }) async {
+    await _secureStorage.write(
+      key: SecureStorage.accessToken,
+      value: accessToken,
+    );
+    await _secureStorage.write(
+      key: SecureStorage.refreshToken,
+      value: refreshToken,
+    );
+    await _secureStorage.write(key: SecureStorage.tokenType, value: tokenType);
+  }
+
+  static Future<void> clearTokens() async {
+    await _secureStorage.delete(key: SecureStorage.accessToken);
+    await _secureStorage.delete(key: SecureStorage.refreshToken);
+    await _secureStorage.delete(key: SecureStorage.tokenType);
+  }
 }

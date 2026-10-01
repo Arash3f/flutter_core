@@ -42,6 +42,44 @@ final class ServerFailure extends Failure {
   List<Object?> get props => [message, namedArgs, statusCode];
 }
 
+/// A structured backend error: the body carried an application `error_code`
+/// (REST JSON body or GraphQL `extensions`), not just an HTTP status.
+///
+/// [message] is whatever the backend sent. When it contains a space it is
+/// shown verbatim, otherwise it is treated as a locale key (see
+/// [describeError]). Branch on [errorCode] for behavior, never on [message].
+final class ApiFailure extends ServerFailure {
+  const ApiFailure({
+    super.message,
+    super.statusCode,
+    super.namedArgs,
+    this.errorCode,
+    this.traceId,
+  });
+
+  /// Backend-specific code. Document the ones your API uses next to
+  /// `ApiErrorCodes` in `core/network/api_error_mapper.dart`.
+  final int? errorCode;
+
+  /// Correlation id for support requests and server logs.
+  final String? traceId;
+
+  @override
+  List<Object?> get props => [
+    message,
+    namedArgs,
+    statusCode,
+    errorCode,
+    traceId,
+  ];
+}
+
+/// The session is gone: the access token was rejected and could not be
+/// refreshed. The auth feature reacts by sending the user to login.
+final class AuthFailure extends Failure {
+  const AuthFailure([super.message = 'errorAuth']);
+}
+
 /// The device has no usable connection.
 final class NetworkFailure extends Failure {
   const NetworkFailure([super.message = 'errorNetwork']);

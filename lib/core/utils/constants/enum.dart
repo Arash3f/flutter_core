@@ -17,7 +17,7 @@ enum LanguageList {
   static const List<Locale> supportedLocales = [Locale('en'), Locale('fa')];
 
   static LanguageList fromCode(String? code) => values.firstWhere(
-        (language) => language.code == code,
-        orElse: () => persian,
-      );
+    (language) => language.code == code,
+    orElse: () => persian,
+  );
 }

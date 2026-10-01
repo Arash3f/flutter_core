@@ -15,11 +15,11 @@ class Todo extends Equatable {
   final bool isCompleted;
 
   Todo copyWith({String? title, bool? isCompleted}) => Todo(
-        id: id,
-        title: title ?? this.title,
-        createdAt: createdAt,
-        isCompleted: isCompleted ?? this.isCompleted,
-      );
+    id: id,
+    title: title ?? this.title,
+    createdAt: createdAt,
+    isCompleted: isCompleted ?? this.isCompleted,
+  );
 
   Todo toggled() => copyWith(isCompleted: !isCompleted);
 

@@ -1,10 +1,15 @@
 # Flutter core
 
-Base project for all Flutter projects: theming, localization, storage, logging
-and a worked Clean Architecture + Riverpod feature, ready to copy.
+Base project for all Flutter projects. It ships theming, localization,
+storage, networking, auth, navigation, an adaptive shell and worked Clean
+Architecture + Riverpod features, ready to copy.
 
 - **State management / DI** — [Riverpod 3](https://riverpod.dev) (no code generation)
 - **Architecture** — feature-first Clean Architecture, see [`lib/features/README.md`](./lib/features/README.md)
+- **Networking** — Dio (REST) and graphql_flutter, with token refresh and error mapping, see [`lib/core/network`](./lib/core/network/README.md)
+- **Auth** — login, session restore, refresh, logout, permissions, sessions, see [`lib/features/auth`](./lib/features/auth/README.md)
+- **Navigation** — go_router with an auth guard, see [`lib/core/router`](./lib/core/router/README.md)
+- **Adaptive layout** — bottom navigation on phones, navigation rail on tablets and desktop (Material 3 breakpoints)
 - **Localization** — easy_localization + flutter_localizations (`en`, `fa`, RTL)
 - **Storage** — SharedPreferences and flutter_secure_storage behind one helper
 - **Responsive** — flutter_screenutil, design size 390×844
@@ -21,8 +26,20 @@ and a worked Clean Architecture + Riverpod feature, ready to copy.
 
 ```shell
 flutter pub get
-flutter run
+flutter run                                   # talks to http://127.0.0.1:8000 in debug
+flutter run --dart-define=AUTH_ENABLED=false  # no backend yet: skip login
 ```
+
+### Build-time configuration
+
+| `--dart-define` | Default | Purpose |
+|---|---|---|
+| `API_BASE_URL` | debug `http://127.0.0.1:8000`, release `https://api.example.com` | backend origin |
+| `GRAPHQL_PATH` | `/graphql` | GraphQL endpoint path |
+| `AUTH_ENABLED` | `true` | `false` disables login and the auth guard |
+
+Edit the release URL in `lib/core/utils/constants/api.dart` when a project
+starts.
 
 ## Important commands
 
@@ -38,9 +55,20 @@ flutter clean            # when builds act weird; then run pub get again
 ### Quality (before push)
 
 ```shell
-dart format lib
+dart format lib test tool
 flutter analyze
+flutter test
 ```
+
+### App icon
+
+```shell
+dart run tool/gen_icon.dart        # placeholder icon from code -> assets/icons/
+dart run flutter_launcher_icons    # writes platform icons from assets/icons/
+```
+
+Replace `assets/icons/app_icon.png` and `app_icon_foreground.png` with real
+artwork when it exists, then rerun the second command.
 
 ### Code generation (only when needed)
 
@@ -83,6 +111,14 @@ Remove-Item Env:PUB_HOSTED_URL -ErrorAction SilentlyContinue
 Remove-Item Env:FLUTTER_STORAGE_BASE_URL -ErrorAction SilentlyContinue
 ```
 
+If pub.dev is unreachable but packages were downloaded before, resolve from
+the local cache:
+
+```powershell
+$env:PUB_CACHE = "$env:LOCALAPPDATA\Pub\Cache"
+flutter pub get --offline
+```
+
 ### Git + commit (Husky)
 
 ```shell
@@ -101,30 +137,38 @@ If `flutter pub get` complains about symlinks, enable **Developer Mode**
 
 ```
 lib/
-├── main.dart                  bootstrap: SharedPrefs + EasyLocalization + ProviderScope
-├── app.dart                   MaterialApp, theme and locale wiring
+├── main.dart                  bootstrap: SharedPrefs + EasyLocalization + desktop window + ProviderScope
+├── app.dart                   MaterialApp.router, theme, locale and SplashGate wiring
 ├── core/
 │   ├── error/                 Failure (domain) and Exception (data) types
+│   ├── network/               REST + GraphQL clients, token refresh, error mapping
 │   ├── providers/             app-wide Riverpod providers (theme, language)
+│   ├── router/                go_router routes and auth guard
 │   ├── usecase/               UseCase contract
-│   ├── widgets/               shared widgets, bottom-navigation shell
+│   ├── widgets/               adaptive shell, splash, page/async/feedback widgets
 │   └── utils/
 │       ├── colors/            palette, gradients, brightness-dependent colors
-│       ├── constants/         sizes, enums, api constants
-│       ├── device/            screen size and platform helpers
+│       ├── constants/         sizes, enums, api config, feature flags
+│       ├── device/            breakpoints, screen size and platform helpers
 │       ├── formatters/        date formatting
 │       ├── gen/               generated assets and fonts
+│       ├── json/              tolerant JSON reader for models
 │       ├── l10n/              generated LocaleKeys
 │       ├── local_storage/     SharedPrefs, SecureStorage, AppStorageHelper
 │       ├── logging/           LoggerService
 │       ├── theme/             light and dark ThemeData
 │       └── validators/        form validators
 └── features/
+    ├── auth/                  login, session, refresh, permissions (REST or GraphQL)
+    ├── profile/               account, password change, sessions (uses auth's use cases)
     ├── todo/                  full domain / data / presentation example
     └── settings/              presentation-only example
+test/                          unit tests: network, breakpoints, use cases
+tool/gen_icon.dart             placeholder launcher icon generator
 ```
 
-Each folder under `lib/core/utils/` has its own README with usage examples.
+`lib/core/network`, `lib/core/router`, `lib/core/widgets` and every folder
+under `lib/core/utils/` have their own README with usage examples.
 
 ## Architecture
 

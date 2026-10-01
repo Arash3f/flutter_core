@@ -48,6 +48,18 @@ business rules testable without a device, and what lets you replace
 `features/settings` is the other end of the scale: a feature with only a
 presentation layer, because it has no business rule of its own.
 
+## Real-world example: `auth` and `profile`
+
+- [`features/auth`](./auth/README.md) is a complete backend-driven feature:
+  - REST and GraphQL data sources behind one contract
+  - token storage
+  - use cases with real rules (keep tokens when offline, password repeat must
+    match)
+  - an app-wide `AsyncNotifier` session that the router listens to
+- `features/profile` is presentation-only on top of auth's use cases. A
+  feature may depend on another feature's **domain** (entities and use cases),
+  never on its data layer.
+
 ## Error handling
 
 There is no `Either`/`Result` type. Instead:

@@ -22,8 +22,16 @@ await AppStorageHelper.setActiveLanguage(LanguageList.persian);
 ThemeMode mode = AppStorageHelper.getActiveTheme();
 await AppStorageHelper.setActiveTheme(ThemeMode.dark);
 
-String? token = await AppStorageHelper.getUserToken();
+String? access = await AppStorageHelper.getAccessToken();
+String? refresh = await AppStorageHelper.getRefreshToken();
+await AppStorageHelper.setTokens(accessToken: 'ey…', refreshToken: 'ey…');
+await AppStorageHelper.clearTokens();
 ```
+
+Tokens are written by the auth feature
+([`AuthLocalDataSource`](../../../features/auth/data/datasources/auth_local_data_source.dart))
+and read by the network layer on every request. Other code should not need
+them.
 
 In the widget tree, read these through
 [`appSettingsProvider`](../../providers/app_settings_provider.dart) rather than

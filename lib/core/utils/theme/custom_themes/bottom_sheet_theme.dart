@@ -6,20 +6,20 @@ class TBottomSheetTheme {
   const TBottomSheetTheme._();
 
   static BottomSheetThemeData lightBottomSheetTheme() => BottomSheetThemeData(
-        backgroundColor: CustomColors.white,
-        modalBackgroundColor: CustomColors.white,
-        showDragHandle: true,
-        shape: _shape,
-        constraints: _constraints,
-      );
+    backgroundColor: CustomColors.white,
+    modalBackgroundColor: CustomColors.white,
+    showDragHandle: true,
+    shape: _shape,
+    constraints: _constraints,
+  );
 
   static BottomSheetThemeData darkBottomSheetTheme() => BottomSheetThemeData(
-        backgroundColor: const Color(0xFF1E293B),
-        modalBackgroundColor: const Color(0xFF1E293B),
-        showDragHandle: true,
-        shape: _shape,
-        constraints: _constraints,
-      );
+    backgroundColor: const Color(0xFF1E293B),
+    modalBackgroundColor: const Color(0xFF1E293B),
+    showDragHandle: true,
+    shape: _shape,
+    constraints: _constraints,
+  );
 
   static final RoundedRectangleBorder _shape = RoundedRectangleBorder(
     borderRadius: BorderRadius.vertical(
@@ -27,6 +27,7 @@ class TBottomSheetTheme {
     ),
   );
 
-  static const BoxConstraints _constraints =
-      BoxConstraints(minWidth: double.infinity);
+  static const BoxConstraints _constraints = BoxConstraints(
+    minWidth: double.infinity,
+  );
 }

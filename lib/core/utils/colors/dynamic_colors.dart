@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_core/core/utils/colors/custom_colors.dart';
 
-enum DynamicColorsName { background, surface, text, textMuted, border }
+enum DynamicColorsName {
+  background,
+  surface,
+
+  /// Cards, dialogs and sheets that sit above [surface].
+  surfaceRaised,
+  text,
+  textMuted,
+  border,
+
+  /// Navigation indicator / selected-chip fill.
+  selection,
+}
 
 /// Colors that differ between light and dark mode.
 ///
@@ -43,6 +55,14 @@ class DynamicColors {
     DynamicColorsName.border: _ColorPair(
       light: CustomColors.greyLight,
       dark: CustomColors.greyDark,
+    ),
+    DynamicColorsName.surfaceRaised: _ColorPair(
+      light: CustomColors.white,
+      dark: Color(0xFF243247),
+    ),
+    DynamicColorsName.selection: _ColorPair(
+      light: CustomColors.primaryMuted,
+      dark: Color(0xFF1E3A8A),
     ),
   };
 }

@@ -16,6 +16,5 @@ class FormatterDate {
     DateTime date, {
     String format = 'dd MMM yyyy',
     String? locale,
-  }) =>
-      DateFormat(format, locale).format(date);
+  }) => DateFormat(format, locale).format(date);
 }

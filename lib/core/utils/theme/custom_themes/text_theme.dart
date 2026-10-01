@@ -11,15 +11,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class TTextTheme {
   const TTextTheme._();
 
-  static TextTheme lightTextTheme() => _build(
-        primary: CustomColors.black,
-        muted: CustomColors.greyDark,
-      );
+  static TextTheme lightTextTheme() =>
+      _build(primary: CustomColors.black, muted: CustomColors.greyDark);
 
-  static TextTheme darkTextTheme() => _build(
-        primary: CustomColors.white,
-        muted: CustomColors.greyLight,
-      );
+  static TextTheme darkTextTheme() =>
+      _build(primary: CustomColors.white, muted: CustomColors.greyLight);
 
   static TextTheme _build({required Color primary, required Color muted}) {
     return TextTheme(

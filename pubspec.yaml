@@ -35,23 +35,44 @@ dependencies:
   #--------------Localization--------------#
   easy_localization: ^3.0.8
 
+  #--------------Network--------------#
+  # REST and GraphQL ship side by side; delete the one your backend does not
+  # speak, see lib/core/network/README.md.
+  dio: ^5.8.0
+  graphql_flutter: ^5.2.0
+  # Only for the `http.Client` type `HttpLink` accepts (tests inject a fake).
+  http: ^1.4.0
+
+  #--------------Navigation--------------#
+  go_router: ^15.1.2
+
   #--------------Utilities--------------#
   logger: ^2.7.0
   flutter_screenutil: ^5.9.3
   equatable: ^2.1.0
   flutter_native_splash: ^2.4.6
 
+  #--------------Platform polish--------------#
+  # Desktop only: minimum window size, title, centering. No-op elsewhere.
+  window_manager: ^0.4.3
+
 #--------------------------------------------#
 #--------------Dev Dependencies--------------#
 #--------------------------------------------#
 
 dev_dependencies:
+  flutter_test:
+    sdk: flutter
   flutter_lints: ^6.0.0
 
   # Loose bounds on purpose: these two share the `analyzer` dependency and
   # tight pins make `pub get` unsolvable whenever either one publishes.
   build_runner: ^2.4.0
   flutter_gen_runner: ^5.4.0
+
+  # Used by `tool/gen_icon.dart` and the launcher icon step below.
+  image: ^4.5.4
+  flutter_launcher_icons: ^0.14.3
 
 #-------------------------------------------#
 #--------------Native Splash----------------#
@@ -63,6 +84,29 @@ flutter_native_splash:
   android_12:
     color: "#2563EB"
     color_dark: "#1D4ED8"
+
+#-------------------------------------------#
+#--------------Launcher Icons---------------#
+#-------------------------------------------#
+# 1. `dart run tool/gen_icon.dart` (or drop your own 1024x1024 PNG in place)
+# 2. `dart run flutter_launcher_icons`
+
+flutter_launcher_icons:
+  image_path: assets/icons/app_icon.png
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  adaptive_icon_background: "#2563EB"
+  adaptive_icon_foreground: assets/icons/app_icon_foreground.png
+  web:
+    generate: true
+    background_color: "#2563EB"
+    theme_color: "#2563EB"
+  windows:
+    generate: true
+    icon_size: 256
+  macos:
+    generate: true
 
 #-------------------------------------------#
 #------------------Flutter------------------#

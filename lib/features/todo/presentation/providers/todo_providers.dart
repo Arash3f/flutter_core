@@ -69,24 +69,21 @@ class TodoListNotifier extends AsyncNotifier<List<Todo>> {
   /// Keeps the previous list on screen while the write is in flight, then
   /// reloads.
   ///
-  /// The `copyWithPrevious` on the result is what matters: `AsyncValue.guard`
-  /// returns a bare `AsyncError`, so without it a failed write would blank the
-  /// list instead of leaving it visible behind an error message.
+  /// Riverpod 3 carries the last value over when an `AsyncNotifier` is set to
+  /// `AsyncLoading` or `AsyncError`, so a failed write leaves the list
+  /// visible (`hasValue && hasError`) instead of blanking it.
   Future<void> _mutate(Future<void> Function() operation) async {
-    final previous = state;
-    state = const AsyncValue<List<Todo>>.loading().copyWithPrevious(previous);
-
-    final result = await AsyncValue.guard(() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       await operation();
       return _load();
     });
-
-    state = result.copyWithPrevious(previous);
   }
 }
 
-final todoListProvider =
-    AsyncNotifierProvider<TodoListNotifier, List<Todo>>(TodoListNotifier.new);
+final todoListProvider = AsyncNotifierProvider<TodoListNotifier, List<Todo>>(
+  TodoListNotifier.new,
+);
 
 /// Derived state. Recomputes only when the count actually changes.
 final remainingTodoCountProvider = Provider<int>((ref) {

@@ -9,6 +9,9 @@ class CustomColors {
 
   static const Color primary = Color(0xFF2563EB);
   static const Color primaryDark = Color(0xFF1D4ED8);
+
+  /// Tinted background for selected chips and navigation indicators.
+  static const Color primaryMuted = Color(0xFFDBEAFE);
   static const Color secondary = Color(0xFF7C3AED);
   static const Color accent = Color(0xFF06B6D4);
 

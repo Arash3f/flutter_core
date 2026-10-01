@@ -13,10 +13,10 @@ class GetTodos implements UseCase<List<Todo>, NoParams> {
     final todos = await _repository.getTodos();
 
     return [...todos]..sort((a, b) {
-        if (a.isCompleted != b.isCompleted) {
-          return a.isCompleted ? 1 : -1;
-        }
-        return b.createdAt.compareTo(a.createdAt);
-      });
+      if (a.isCompleted != b.isCompleted) {
+        return a.isCompleted ? 1 : -1;
+      }
+      return b.createdAt.compareTo(a.createdAt);
+    });
   }
 }

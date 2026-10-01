@@ -44,8 +44,9 @@ class ValidatorHelper {
   /// * Validate Password Empty & format
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return LocaleKeys.inputRequired
-          .tr(namedArgs: {'fieldName': LocaleKeys.password.tr()});
+      return LocaleKeys.inputRequired.tr(
+        namedArgs: {'fieldName': LocaleKeys.password.tr()},
+      );
     }
 
     /// ? Check for minimum password length
@@ -74,8 +75,9 @@ class ValidatorHelper {
   /// * Validate PhoneNumber
   static String? validatePhoneNumber(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return LocaleKeys.inputRequired
-          .tr(namedArgs: {'fieldName': LocaleKeys.phoneNumber.tr()});
+      return LocaleKeys.inputRequired.tr(
+        namedArgs: {'fieldName': LocaleKeys.phoneNumber.tr()},
+      );
     }
 
     if (!_phoneRegExp.hasMatch(value.trim())) {
