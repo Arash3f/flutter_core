@@ -34,35 +34,34 @@ class DynamicColors {
     return brightness == Brightness.dark ? pair.dark : pair.light;
   }
 
-  // Config all project's dynamic color here ...
   static const Map<DynamicColorsName, _ColorPair> _dynamicColors = {
     DynamicColorsName.background: _ColorPair(
-      light: Color(0xFFFFFFFF),
-      dark: Color(0xFF0F172A),
+      light: CustomColors.paper,
+      dark: CustomColors.ink,
     ),
     DynamicColorsName.surface: _ColorPair(
-      light: Color(0xFFF3F4F6),
-      dark: Color(0xFF1E293B),
+      light: CustomColors.white,
+      dark: CustomColors.line,
     ),
     DynamicColorsName.text: _ColorPair(
-      light: CustomColors.black,
-      dark: CustomColors.white,
+      light: CustomColors.ink,
+      dark: CustomColors.paper,
     ),
     DynamicColorsName.textMuted: _ColorPair(
       light: CustomColors.greyDark,
-      dark: CustomColors.greyLight,
+      dark: CustomColors.muted,
     ),
     DynamicColorsName.border: _ColorPair(
       light: CustomColors.greyLight,
-      dark: CustomColors.greyDark,
+      dark: Color(0xFF1C2738),
     ),
     DynamicColorsName.surfaceRaised: _ColorPair(
       light: CustomColors.white,
-      dark: Color(0xFF243247),
+      dark: Color(0xFF151B28),
     ),
     DynamicColorsName.selection: _ColorPair(
       light: CustomColors.primaryMuted,
-      dark: Color(0xFF1E3A8A),
+      dark: Color(0xFF0A2A5C),
     ),
   };
 }

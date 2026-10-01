@@ -57,8 +57,12 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final base = isDark ? CustomColors.primaryDark : CustomColors.primary;
-    const ink = CustomColors.white;
+    // Brand primary form: Signal Blue on light, Ink + blue mark on dark.
+    final base = isDark ? CustomColors.ink : CustomColors.primary;
+    final ink = isDark ? CustomColors.primary : CustomColors.white;
+    final markAsset = isDark
+        ? 'assets/brand/mark-blue.png'
+        : 'assets/brand/mark-white.png';
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
@@ -91,7 +95,12 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     children: [
                       const Spacer(flex: 5),
-                      _Emblem(intro: intro, pulse: pulse, ink: ink),
+                      _Emblem(
+                        intro: intro,
+                        pulse: pulse,
+                        ink: ink,
+                        markAsset: markAsset,
+                      ),
                       const SizedBox(height: 32),
                       _BrandCopy(intro: intro, ink: ink),
                       const Spacer(flex: 4),
@@ -113,11 +122,17 @@ class _SplashScreenState extends State<SplashScreen>
 }
 
 class _Emblem extends StatelessWidget {
-  const _Emblem({required this.intro, required this.pulse, required this.ink});
+  const _Emblem({
+    required this.intro,
+    required this.pulse,
+    required this.ink,
+    required this.markAsset,
+  });
 
   final double intro;
   final double pulse;
   final Color ink;
+  final String markAsset;
 
   @override
   Widget build(BuildContext context) {
@@ -145,15 +160,11 @@ class _Emblem extends StatelessWidget {
               ),
               Transform.scale(
                 scale: 1 + pulse * 0.03,
-                child: Container(
+                child: Image.asset(
+                  markAsset,
                   width: 112,
                   height: 112,
-                  decoration: BoxDecoration(
-                    color: ink.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(34),
-                    border: Border.all(color: ink.withValues(alpha: 0.3)),
-                  ),
-                  child: Icon(Icons.layers_rounded, size: 58, color: ink),
+                  filterQuality: FilterQuality.high,
                 ),
               ),
             ],

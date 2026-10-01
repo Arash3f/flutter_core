@@ -29,7 +29,7 @@ features belongs here; anything used by one stays in that feature's
 | `AppInitialsAvatar` / `AppIconBadge` | leading slots for `AppEntityCard` |
 | `AppFilterPills<T>` | horizontally scrolling single-choice chips (filters, sub-tabs) |
 | `AppSectionCard` | outlined surface that groups a form or a settings block |
-| `AppMark` | logo mark. Replace it with your brand asset |
+| `AppMark` | Arash Alfooneh ribbon mark (`assets/brand/mark-blue.png`) |
 | `AppAtmosphere` | soft brand gradient behind full-screen pages |
 | `appMutedOf(context)` | muted text color |
 

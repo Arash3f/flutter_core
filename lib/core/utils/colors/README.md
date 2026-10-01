@@ -1,5 +1,15 @@
-
 # Colors
+
+Brand tokens from the Arash Alfooneh **Ribbon A** kit (`assets/brand/`).
+
+| Token | Hex | Dart |
+| --- | --- | --- |
+| Signal Blue | `#016DF1` | `CustomColors.primary` |
+| Bright Blue | `#2F8BFF` | `CustomColors.secondary` |
+| Ink | `#08090D` | `CustomColors.ink` |
+| Paper | `#F5F7FA` | `CustomColors.paper` |
+| Muted | `#9AA4B2` | `CustomColors.muted` |
+| Line | `#111C2D` | `CustomColors.line` |
 
 Three files, split by what changes:
 
@@ -7,30 +17,12 @@ Three files, split by what changes:
 |---|---|
 | `custom_colors.dart` | brand palette that is the same in light and dark |
 | `custom_gradient_colors.dart` | reusable gradients |
-| `dynamic_colors.dart` | colors that differ per brightness |
+| `dynamic_colors.dart` | colors that differ per brightness (Paper / Ink surfaces) |
 
-## Usage/Examples
+## Usage
 
-Static brand colors ...
 ```dart
-import 'package:flutter_core/core/utils/colors/custom_colors.dart';
-
 Container(color: CustomColors.primary);
-```
-
-Gradients ...
-```dart
-import 'package:flutter_core/core/utils/colors/custom_gradient_colors.dart';
-
-DecoratedBox(
-  decoration: BoxDecoration(gradient: CustomGradientColors.primary),
-  child: child,
-);
-```
-
-Brightness-dependent colors ...
-```dart
-import 'package:flutter_core/core/utils/colors/dynamic_colors.dart';
 
 Text(
   'hello',
@@ -38,11 +30,7 @@ Text(
 );
 ```
 
-`DynamicColors.of` reads the brightness from `Theme.of(context)`, so the value
-stays correct when the theme is `ThemeMode.system` or the user flips the system
-theme while the app is running.
-
-Outside a widget (in `theme.dart`, for example) pass the brightness explicitly:
+Outside a widget pass brightness explicitly:
 
 ```dart
 DynamicColors.get(DynamicColorsName.background, brightness: Brightness.dark);
@@ -50,6 +38,5 @@ DynamicColors.get(DynamicColorsName.background, brightness: Brightness.dark);
 
 ## Adding a color
 
-Add the name to `DynamicColorsName` and a light/dark pair to the
-`_dynamicColors` map in the same commit — the lookup asserts the entry exists,
-so a missing pair fails loudly instead of returning `null`.
+Add the name to `DynamicColorsName` and a light/dark pair to `_dynamicColors`
+in the same commit — the lookup asserts the entry exists.

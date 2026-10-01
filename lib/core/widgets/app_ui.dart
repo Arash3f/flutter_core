@@ -195,30 +195,27 @@ class AppEntityCard extends StatelessWidget {
   }
 }
 
-/// The app's logo mark. Replace the icon with your brand asset.
+/// Arash Alfooneh ribbon mark (`assets/brand/mark-blue.png`).
+///
+/// Brand rule: use the ribbon form at 48 px and above. Below that the kit
+/// ships a bold small-size mark; this widget is for chrome / splash / hero.
 class AppMark extends StatelessWidget {
   const AppMark({this.size = 40, super.key});
 
   final double size;
 
+  static const asset = 'assets/brand/mark-blue.png';
+
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(size * 0.32),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [scheme.primary, scheme.primary.withValues(alpha: 0.72)],
-        ),
-      ),
-      child: Icon(
-        Icons.layers_rounded,
-        color: scheme.onPrimary,
-        size: size * 0.52,
+    return SizedBox.square(
+      dimension: size,
+      child: Image.asset(
+        asset,
+        width: size,
+        height: size,
+        filterQuality: FilterQuality.high,
+        semanticLabel: 'Arash Alfooneh',
       ),
     );
   }
