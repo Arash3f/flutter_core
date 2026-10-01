@@ -34,7 +34,9 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
 
     await AppStorageHelper.setActiveTheme(themeMode);
     if (!ref.mounted) return;
-    state = state.copyWith(themeMode: themeMode);
+    // Preserve language explicitly: a rebuild mid-language-change must not
+    // drop the other field if a future copyWith ever treats enums as nullable.
+    state = state.copyWith(themeMode: themeMode, language: state.language);
   }
 
   Future<void> setLanguage(LanguageList language) async {
@@ -42,7 +44,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
 
     await AppStorageHelper.setActiveLanguage(language);
     if (!ref.mounted) return;
-    state = state.copyWith(language: language);
+    state = state.copyWith(language: language, themeMode: state.themeMode);
   }
 }
 

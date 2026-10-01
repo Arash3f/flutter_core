@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_core/core/providers/app_settings_provider.dart';
 import 'package:flutter_core/core/router/app_routes.dart';
 import 'package:flutter_core/core/utils/constants/feature_flags.dart';
 import 'package:flutter_core/core/utils/device/breakpoints.dart';
@@ -80,6 +81,8 @@ class AdaptiveShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Subscribe so nav labels rebuild with `.tr()` even if a parent forgot to.
+    ref.watch(appSettingsProvider.select((s) => s.language));
     final auth = ref.watch(authSessionProvider).value;
     final location = GoRouterState.of(context).uri.path;
     final width = MediaQuery.sizeOf(context).width;

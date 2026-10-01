@@ -152,15 +152,23 @@ class AppearancePanel extends ConsumerWidget {
   }
 }
 
-/// Persists [language] and tells easy_localization, which keeps its own copy
-/// of the locale. Always change the language through here.
+/// Persists [language] and keeps EasyLocalization aligned with it.
+///
+/// Always change the language through here (or `AppSettingsNotifier`), never
+/// by calling `context.setLocale` alone — the App widget also listens to
+/// [appSettingsProvider] so a theme rebuild cannot leave locale half-applied.
 Future<void> setAppLanguage(
   BuildContext context,
   WidgetRef ref,
   LanguageList language,
 ) async {
+  // Apply EasyLocalization first while this context is still mounted. Theme
+  // changes rebuild MaterialApp; doing setLocale after the provider update
+  // often runs against a disposed sheet/list context and silently no-ops.
+  if (context.mounted && context.locale != language.locale) {
+    await context.setLocale(language.locale);
+  }
   await ref.read(appSettingsProvider.notifier).setLanguage(language);
-  if (context.mounted) await context.setLocale(language.locale);
 }
 
 String themeModeLabel(ThemeMode mode) => switch (mode) {

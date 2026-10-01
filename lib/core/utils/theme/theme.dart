@@ -60,16 +60,19 @@ class TAppTheme {
     Color dynamic(DynamicColorsName name) =>
         DynamicColors.get(name, brightness: brightness);
 
-    final scheme = ColorScheme.fromSeed(
-      seedColor: CustomColors.primary,
-      brightness: brightness,
-      error: CustomColors.error,
-      surface: dynamic(DynamicColorsName.surfaceRaised),
-    );
     final background = dynamic(DynamicColorsName.background);
     final card = dynamic(DynamicColorsName.surfaceRaised);
     final divider = dynamic(DynamicColorsName.border);
     final selection = dynamic(DynamicColorsName.selection);
+    // Keep ColorScheme.surface in sync with scaffoldBackgroundColor. A mismatch
+    // flashes white (or a different shade) on every route change because page
+    // transitions paint with `surface` before the scaffold color settles.
+    final scheme = ColorScheme.fromSeed(
+      seedColor: CustomColors.primary,
+      brightness: brightness,
+      error: CustomColors.error,
+      surface: background,
+    );
     final radius = BorderRadius.circular(TSizes.buttonRadius);
     final cardShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(TSizes.cardRadiusLg),

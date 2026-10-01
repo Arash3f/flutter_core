@@ -4,23 +4,25 @@ import 'package:flutter_core/core/utils/colors/custom_colors.dart';
 class TAppBarTheme {
   const TAppBarTheme._();
 
+  /// Same fill as [DynamicColorsName.background] / scaffold — avoids a white
+  /// bar over a Paper body (or the reverse) when switching tabs.
   static const AppBarTheme lightAppBarTheme = AppBarTheme(
-    backgroundColor: CustomColors.white,
-    foregroundColor: CustomColors.black,
+    backgroundColor: CustomColors.paper,
+    foregroundColor: CustomColors.ink,
     surfaceTintColor: Colors.transparent,
-    iconTheme: IconThemeData(color: CustomColors.black),
-    actionsIconTheme: IconThemeData(color: CustomColors.black),
+    iconTheme: IconThemeData(color: CustomColors.ink),
+    actionsIconTheme: IconThemeData(color: CustomColors.ink),
     elevation: 0,
     scrolledUnderElevation: 0,
     centerTitle: true,
   );
 
   static const AppBarTheme darkAppBarTheme = AppBarTheme(
-    backgroundColor: Color(0xFF0F172A),
-    foregroundColor: CustomColors.white,
+    backgroundColor: CustomColors.ink,
+    foregroundColor: CustomColors.paper,
     surfaceTintColor: Colors.transparent,
-    iconTheme: IconThemeData(color: CustomColors.white),
-    actionsIconTheme: IconThemeData(color: CustomColors.white),
+    iconTheme: IconThemeData(color: CustomColors.paper),
+    actionsIconTheme: IconThemeData(color: CustomColors.paper),
     elevation: 0,
     scrolledUnderElevation: 0,
     centerTitle: true,

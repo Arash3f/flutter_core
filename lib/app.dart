@@ -20,6 +20,20 @@ class App extends ConsumerWidget {
     final settings = ref.watch(appSettingsProvider);
     final router = ref.watch(appRouterProvider);
 
+    // Keep EasyLocalization in lockstep with AppSettings. Language taps often
+    // happen from a sheet or list that rebuilds (or disposes) right after a
+    // theme change; syncing here — under EasyLocalization, above MaterialApp —
+    // survives that and prevents "font flipped but strings did not" states.
+    ref.listen(appSettingsProvider.select((s) => s.language), (previous, next) {
+      if (previous == next) return;
+      if (context.locale == next.locale) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted && context.locale != next.locale) {
+          context.setLocale(next.locale);
+        }
+      });
+    });
+
     return ScreenUtilInit(
       designSize: designSize,
       minTextAdapt: true,
@@ -34,12 +48,16 @@ class App extends ConsumerWidget {
         darkTheme: TAppTheme.darkTheme(settings.language),
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
-        locale: context.locale,
+        locale: settings.language.locale,
         routerConfig: router,
-        // Above the router's Navigator, so the splash covers every route
-        // while the session is being restored.
-        builder: (context, routed) =>
-            SplashGate(child: routed ?? const SizedBox.shrink()),
+        // `LocaleKeys.x.tr()` reads a singleton and does not subscribe the
+        // widget to locale changes. Keying the tree by language forces every
+        // open screen (shell, sticky State objects, …) to rebuild with the
+        // new translations instead of leaving stale copy on the same page.
+        builder: (context, routed) => KeyedSubtree(
+          key: ValueKey(settings.language.code),
+          child: SplashGate(child: routed ?? const SizedBox.shrink()),
+        ),
       ),
     );
   }
