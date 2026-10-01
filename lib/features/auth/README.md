@@ -23,6 +23,28 @@ presentation/
 The profile screen (`features/profile`) is built on these use cases and has no
 data layer of its own.
 
+## Offline demo login
+
+For UI work without a backend, sign in with:
+
+| Field | Value |
+| --- | --- |
+| username | `admin` |
+| password | `admin` |
+
+The repository stores local demo tokens and never calls the network for that
+account (`DemoAuth` in `data/demo_auth.dart`). Remove or change it before a
+real release.
+
+## Companion: NestJS Core REST
+
+This feature is meant to pair with
+[nestJs-core-rest](https://github.com/Arash3f/nestJs-core-rest). Path names on
+that API differ from the defaults in `AuthEndpoints` (for example
+`POST /auth/logIn`, `POST /auth/refreshToken`, `GET /user/me`,
+`PATCH /auth/changeMyPassword`). Adjust the REST data source when you connect
+the two projects; keep the domain and presentation layers unchanged.
+
 ## Using the session
 
 ```dart

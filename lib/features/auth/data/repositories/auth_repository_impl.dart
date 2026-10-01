@@ -3,6 +3,7 @@ import 'package:flutter_core/core/network/api_error_mapper.dart';
 import 'package:flutter_core/core/utils/logging/logger.dart';
 import 'package:flutter_core/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:flutter_core/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:flutter_core/features/auth/data/demo_auth.dart';
 import 'package:flutter_core/features/auth/domain/entities/auth_user.dart';
 import 'package:flutter_core/features/auth/domain/entities/user_session.dart';
 import 'package:flutter_core/features/auth/domain/repositories/auth_repository.dart';
@@ -13,9 +14,16 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remote;
   final AuthLocalDataSource _local;
 
+  Future<bool> get _isDemoSession async =>
+      DemoAuth.isDemoToken(await _local.readAccessToken());
+
   @override
   Future<void> login({required String username, required String password}) =>
       _guard(() async {
+        if (DemoAuth.matchesCredentials(username, password)) {
+          await _local.saveTokens(DemoAuth.tokens);
+          return;
+        }
         final tokens = await _remote.login(
           username: username,
           password: password,
@@ -33,6 +41,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<bool> refreshSession() async {
     final refreshToken = await _local.readRefreshToken();
     if (refreshToken == null || refreshToken.isEmpty) return false;
+    if (DemoAuth.isDemoToken(refreshToken)) return true;
     try {
       await _local.saveTokens(await _remote.refresh(refreshToken));
       return true;
@@ -52,33 +61,51 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> clearSession() => _local.clear();
 
   @override
-  Future<AuthUser> getCurrentUser() => _guard(_remote.me);
+  Future<AuthUser> getCurrentUser() => _guard(() async {
+        if (await _isDemoSession) return DemoAuth.user;
+        return _remote.me();
+      });
 
   @override
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,
-  }) => _guard(
-    () => _remote.changePassword(
-      currentPassword: currentPassword,
-      newPassword: newPassword,
-    ),
-  );
+  }) =>
+      _guard(() async {
+        if (await _isDemoSession) {
+          if (currentPassword != DemoAuth.password) {
+            throw const AuthFailure('errorInvalidCredentials');
+          }
+          // Demo has nowhere to persist a new password; accept the call.
+          return;
+        }
+        await _remote.changePassword(
+          currentPassword: currentPassword,
+          newPassword: newPassword,
+        );
+      });
 
   @override
-  Future<List<UserSession>> getSessions() => _guard(_remote.sessions);
+  Future<List<UserSession>> getSessions() => _guard(() async {
+        if (await _isDemoSession) return DemoAuth.sessions();
+        return _remote.sessions();
+      });
 
   @override
-  Future<void> revokeSession(String sessionId) =>
-      _guard(() => _remote.revokeSession(sessionId));
+  Future<void> revokeSession(String sessionId) => _guard(() async {
+        if (await _isDemoSession) return;
+        await _remote.revokeSession(sessionId);
+      });
 
   /// The server call is best effort: being offline or already expired must
   /// never keep the user signed in on this device.
   Future<void> _endSession(Future<void> Function() remoteCall) async {
-    try {
-      await remoteCall();
-    } on Object catch (error) {
-      LoggerService.warning('Remote logout failed, clearing locally: $error');
+    if (!await _isDemoSession) {
+      try {
+        await remoteCall();
+      } on Object catch (error) {
+        LoggerService.warning('Remote logout failed, clearing locally: $error');
+      }
     }
     await _local.clear();
   }
